@@ -78,3 +78,4 @@ Open `http://localhost:3000`.
 - `GET /api/inventory/movements`
 - `POST /api/inventory/adjustments`
 - `GET /api/reports/summary`
+
