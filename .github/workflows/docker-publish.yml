@@ -1,0 +1,39 @@
+name: Build and Push Docker Image
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    packages: write
+
+env:
+    IMAGE_NAME: pos-tool
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Log in to Github Container Registry
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build Docker image
+              run: |
+                docker build \
+                    -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest \
+                    -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                    .
+            - name: Push Docker image
+              run: |
+                docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+                docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
