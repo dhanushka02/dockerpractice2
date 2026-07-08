@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>POS Tool</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <p class="eyebrow">Point of Sale</p>
+          <h1>POS Tool</h1>
+        </div>
+        <nav class="nav">
+          <button class="nav-button active" data-view="pos">Register</button>
+          <button class="nav-button" data-view="products">Products</button>
+          <button class="nav-button" data-view="customers">Customers</button>
+          <button class="nav-button" data-view="inventory">Inventory</button>
+          <button class="nav-button" data-view="reports">Reports</button>
+          <button class="nav-button" data-view="sales">Sales</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div id="toast" class="toast" hidden></div>
+
+        <section id="view-pos" class="view active">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Register</p>
+              <h2>Checkout</h2>
+            </div>
+            <button id="refresh-pos" class="secondary-button">Refresh</button>
+          </div>
+
+          <div class="pos-layout">
+            <section class="panel products-panel">
+              <div class="toolbar">
+                <input id="product-search" type="search" placeholder="Search products or SKU">
+                <select id="category-filter">
+                  <option value="">All categories</option>
+                </select>
+              </div>
+              <div id="product-grid" class="product-grid"></div>
+            </section>
+
+            <section class="panel cart-panel">
+              <div class="cart-top">
+                <h3>Cart</h3>
+                <button id="clear-cart" class="text-button">Clear</button>
+              </div>
+              <div id="cart-items" class="cart-items"></div>
+
+              <div class="checkout-fields">
+                <label>
+                  Customer
+                  <select id="sale-customer"></select>
+                </label>
+                <label>
+                  Payment
+                  <select id="payment-method">
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                    <option value="bank_transfer">Bank transfer</option>
+                  </select>
+                </label>
+                <label id="cash-field">
+                  Cash received
+                  <input id="cash-received" type="number" min="0" step="0.01" placeholder="0.00">
+                </label>
+              </div>
+
+              <div class="totals">
+                <div><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+                <div><span>Discount</span><strong id="cart-discount">$0.00</strong></div>
+                <div><span>Tax</span><strong id="cart-tax">$0.00</strong></div>
+                <div class="grand-total"><span>Total</span><strong id="cart-total">$0.00</strong></div>
+                <div><span>Change</span><strong id="cart-change">$0.00</strong></div>
+              </div>
+
+              <button id="checkout-button" class="primary-button">Complete Sale</button>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-products" class="view">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Catalog</p>
+              <h2>Products</h2>
+            </div>
+          </div>
+
+          <div class="split-layout">
+            <form id="product-form" class="panel form-panel">
+              <h3 id="product-form-title">Add product</h3>
+              <input type="hidden" id="product-id">
+              <label>SKU <input id="product-sku" required></label>
+              <label>Name <input id="product-name" required></label>
+              <label>Category <select id="product-category"></select></label>
+              <div class="form-grid">
+                <label>Price <input id="product-price" type="number" min="0" step="0.01" required></label>
+                <label>Cost <input id="product-cost" type="number" min="0" step="0.01"></label>
+                <label>Stock <input id="product-stock" type="number" min="0" step="1"></label>
+                <label>Low stock <input id="product-low-stock" type="number" min="0" step="1"></label>
+              </div>
+              <label class="checkbox-label">
+                <input id="product-active" type="checkbox" checked>
+                Active product
+              </label>
+              <div class="button-row">
+                <button class="primary-button" type="submit">Save Product</button>
+                <button id="reset-product-form" class="secondary-button" type="button">Reset</button>
+              </div>
+            </form>
+
+            <section class="panel">
+              <div class="toolbar">
+                <input id="products-search" type="search" placeholder="Search catalog">
+                <button id="reload-products" class="secondary-button">Reload</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Name</th>
+                      <th>Price</th>
+                      <th>Stock</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="products-table"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-customers" class="view">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">People</p>
+              <h2>Customers</h2>
+            </div>
+          </div>
+
+          <div class="split-layout">
+            <form id="customer-form" class="panel form-panel">
+              <h3 id="customer-form-title">Add customer</h3>
+              <input type="hidden" id="customer-id">
+              <label>Name <input id="customer-name" required></label>
+              <label>Phone <input id="customer-phone"></label>
+              <label>Email <input id="customer-email" type="email"></label>
+              <label>Address <textarea id="customer-address" rows="4"></textarea></label>
+              <div class="button-row">
+                <button class="primary-button" type="submit">Save Customer</button>
+                <button id="reset-customer-form" class="secondary-button" type="button">Reset</button>
+              </div>
+            </form>
+
+            <section class="panel">
+              <div class="toolbar">
+                <input id="customers-search" type="search" placeholder="Search customers">
+                <button id="reload-customers" class="secondary-button">Reload</button>
+              </div>
+              <div id="customers-list" class="list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-inventory" class="view">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Stock</p>
+              <h2>Inventory</h2>
+            </div>
+          </div>
+
+          <div class="split-layout">
+            <form id="inventory-form" class="panel form-panel">
+              <h3>Adjust stock</h3>
+              <label>Product <select id="inventory-product"></select></label>
+              <label>Movement
+                <select id="inventory-type">
+                  <option value="restock">Restock</option>
+                  <option value="adjustment">Adjustment</option>
+                </select>
+              </label>
+              <label>Quantity change <input id="inventory-quantity" type="number" step="1" placeholder="Use negative for reductions" required></label>
+              <label>Note <textarea id="inventory-note" rows="4"></textarea></label>
+              <button class="primary-button" type="submit">Save Movement</button>
+            </form>
+
+            <section class="panel">
+              <div class="toolbar">
+                <h3>Latest movements</h3>
+                <button id="reload-inventory" class="secondary-button">Reload</button>
+              </div>
+              <div id="inventory-list" class="list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="view-reports" class="view">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Performance</p>
+              <h2>Reports</h2>
+            </div>
+            <button id="reload-reports" class="secondary-button">Reload</button>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric">
+              <span>Today revenue</span>
+              <strong id="report-revenue">$0.00</strong>
+            </article>
+            <article class="metric">
+              <span>Today orders</span>
+              <strong id="report-orders">0</strong>
+            </article>
+            <article class="metric">
+              <span>Low stock items</span>
+              <strong id="report-low-stock-count">0</strong>
+            </article>
+          </div>
+
+          <div class="split-layout">
+            <section class="panel">
+              <h3>Top products</h3>
+              <div id="top-products-list" class="list"></div>
+            </section>
+            <section class="panel">
+              <h3>Low stock</h3>
+              <div id="low-stock-list" class="list"></div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <h3>Last 7 days</h3>
+            <div id="sales-by-day" class="bar-list"></div>
+          </section>
+        </section>
+
+        <section id="view-sales" class="view">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Receipts</p>
+              <h2>Sales History</h2>
+            </div>
+            <button id="reload-sales" class="secondary-button">Reload</button>
+          </div>
+          <div class="split-layout">
+            <section class="panel">
+              <div id="sales-list" class="list"></div>
+            </section>
+            <section class="panel receipt-panel">
+              <h3>Receipt</h3>
+              <div id="receipt-details" class="receipt-empty">Select a sale to view receipt details.</div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
